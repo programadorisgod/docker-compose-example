@@ -1,0 +1,41 @@
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:5000"
+    volumes:
+      - .:/code
+    environment:
+      FLASK_ENV: development
+      FLASK_DEBUG: "true"
+    depends_on:
+      - redis
+      - nginx
+    networks:
+       - network-compose
+
+  redis:
+    image: "redis:alpine"
+    networks:
+       - network-compose
+  
+  nginx:
+    image: "nginx:alpine"
+    ports:
+      - "80:80"
+    volumes:
+      - .:/code
+    networks:
+       network-compose:
+        aliases:
+          - "nginx-network-1"
+
+volumes:
+   .: {}
+
+networks:
+  network-compose:
+    driver: bridge
+    ipam:
+      driver: default
